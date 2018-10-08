@@ -205,6 +205,13 @@ public class PeopleSoftDAO {
 			Document responseDocument = Jsoup.parse(response.body());
 			Elements rowLeftHalf = responseDocument.select("table[id=tdgblTL_MGR_SRCH_VW$0] > tbody > tr");
 			Elements rowsRightHalf = responseDocument.select("table[id=tdgbrTL_MGR_SRCH_VW$0] > tbody > tr");
+			String empCount = responseDocument.select("span[class=PSGRIDCOUNTER]").text();
+			String[] emps = empCount.split(" ");
+			System.out.println("Time Before MultiThreading: "+ System.currentTimeMillis());
+			System.out.println("(inside getProj)EMP Count rn: "+ empCount);
+			int empC = Integer.parseInt(emps[2]);
+			for(int i = 0;i<empC;i++) {
+			System.out.println("(inside computeTimesheet)EMP name rn: "+ responseDocument.select("a[id=LAST_NAME$"+i+"]").text());}
 			int count = 0;
 			System.out.println("2: " + ((double) ((System.nanoTime() - startTime) / 1000000000.0)));
 			if (rowLeftHalf.size() != 0) {
@@ -246,6 +253,7 @@ public class PeopleSoftDAO {
 			String projectID, int count, Element rowLeftHalf, Element rowRightHalf, String date, String userName,
 			String password, int choice) {
 		long startTime = System.nanoTime();
+		System.out.println("Thread ID: "+Thread.currentThread().getId());
 		try {
 			Connection.Response response;
 			if (choice == Constants.APPROVED) {
@@ -278,6 +286,13 @@ public class PeopleSoftDAO {
 							.header("Content-Type", "application/x-www-form-urlencoded").method(Connection.Method.POST)
 							.execute();
 				}
+
+				if(!response.body().isEmpty()) {
+				Document responseDocument = Jsoup.parse(response.body());
+				String empCount = responseDocument.select("span[class=PSGRIDCOUNTER]").text();
+				System.out.println("(inside computeTimesheet)EMP Count rn: "+ empCount);
+				System.out.println("(inside computeTimesheet)EMP name rn: "+ responseDocument.select("span[id=FIRST_NAME**]").text());
+				}
 			} else if (choice == Constants.PENDING) {
 					response = Jsoup.connect(Constants.TIMESHEET_PENDING_APPROVALS_URL).userAgent(Constants.USERAGENT)
 							.cookies(loginCookies).header("Origin", Constants.BASE_ORIGIN)
@@ -308,6 +323,11 @@ public class PeopleSoftDAO {
 							.header("Content-Type", "application/x-www-form-urlencoded").method(Connection.Method.POST)
 							.execute();
 				}
+
+				if(!response.body().isEmpty()) {
+				Document responseDocument = Jsoup.parse(response.body());
+				String empCount = responseDocument.select("span[class=PSGRIDCOUNTER]").text();
+				System.out.println("(inside computeTimesheet)EMP Count rn: "+ empCount);}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

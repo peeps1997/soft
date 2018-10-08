@@ -62,8 +62,11 @@ public class Controller {
 	public ResponseEntity<LinkedList<TimesheetApproval>> searchApproved(@RequestParam("userName") String userName,
 			@RequestParam("password") String password, @RequestParam("projectID") String projectID,
 			@RequestParam("date") String date) {
+		Long t1 = System.currentTimeMillis();
+		System.out.println("Request Started: " + t1);
 		ListenableFuture<LinkedList<TimesheetApproval>> employeeFuture = JdkFutureAdapters.listenInPoolThread(
 				PeopleSoftDAO.searchEmployeesApprovedReportsViaProject(projectID, date, userName, password));
+		System.out.println("Controller Thread ID: "+Thread.currentThread().getId());
 		Futures.addCallback(employeeFuture, new FutureCallback<LinkedList<TimesheetApproval>>() {
 
 			@Override
